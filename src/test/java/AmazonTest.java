@@ -2,6 +2,7 @@ import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -15,16 +16,19 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
+
 public class AmazonTest {
 
     AndroidDriver<MobileElement> driver;
     WebElement skipSignUp;
     SoftAssert softAssert;
     WebElement searchTextField;
+    MobileActions mobileActions;
 
     @BeforeClass
     public void beforeClass(){
         softAssert = new SoftAssert();
+        mobileActions = new MobileActions();
 
     }
 
@@ -93,6 +97,23 @@ public class AmazonTest {
 
         Thread.sleep(2000);
 
+    }
+
+    @Test(description = "click on the first search result",dependsOnMethods = "searchPhone")
+    public void selectFirstItem() throws InterruptedException {
+        driver.manage().timeouts().implicitlyWait(3000,TimeUnit.MILLISECONDS);
+        driver.findElement(By.xpath("//android.view.View[@resource-id='search']/android.view.View[4]")).click();
+
+        //if the add to Cart button is found click on the Add to cart Button
+        try {
+            mobileActions.scrollUp(driver);
+            driver.findElement(By.xpath("//android.widget.Button[@text='Add to Cart']")).click();
+        }catch (NoSuchElementException e){
+            System.out.println("Cart Button not found");
+            e.printStackTrace();
+        }
+        Thread.sleep(2000);
+        //Extra wait time added to be able to view the steps at a slower speed.
     }
 
     @AfterClass(alwaysRun = true)
